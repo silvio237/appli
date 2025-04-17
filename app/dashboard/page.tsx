@@ -8,22 +8,28 @@ import Image from 'next/image';
 import { Clock, SquareArrowOutUpRight, Users } from 'lucide-react';
 import Link from 'next/link';
 
-
-const page = () => {
-  const { user } = useKindeBrowserClient()
-  const [companyId, setCompanyId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [rooms, setRooms] = useState<any[]>([])
-  const [companyName, setCompanyName] = useState('')
+// Correction du nom du composant pour commencer par une majuscule
+const Page = () => {
+  const { user } = useKindeBrowserClient();
+  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [rooms, setRooms] = useState<{
+    id: string;
+    name: string;
+    capacity: number;
+    description: string;
+    imgUrl: string | null;
+  }[]>([]); // Typage des rooms
+  const [companyName, setCompanyName] = useState<string>('');
 
   const cleanupExpiredReservations = async () => {
-      try {
-        await fetch('/api/cleanupReservations' , {
-          method: 'DELETE'
-        })
-      } catch (error) {
-         console.error(error)
-      }
+    try {
+      await fetch('/api/cleanupReservations', {
+        method: 'DELETE'
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const fetchCompanyId = async () => {
@@ -41,49 +47,45 @@ const page = () => {
           })
         });
 
-        const data = await response.json()
-        setCompanyId(data.companyId || null)
-        setLoading(false)
+        const data = await response.json();
+        setCompanyId(data.companyId || null);
+        setLoading(false);
 
       } catch (error) {
-        console.error('erreur', error)
-        setCompanyId(null)
+        console.error('erreur', error);
+        setCompanyId(null);
       }
     }
   }
 
   const fetchRooms = async () => {
     if (companyId) {
-      setLoading(true)
+      setLoading(true);
       try {
-        const response = await fetch(`/api/rooms?companyId=${companyId}`)
+        const response = await fetch(`/api/rooms?companyId=${companyId}`);
         if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des salles.')
+          throw new Error('Erreur lors de la récupération des salles.');
         }
-        const data = await response.json()
-        setRooms(data.rooms)
-        setCompanyName(data.companyName)
-        setLoading(false)
+        const data = await response.json();
+        setRooms(data.rooms);
+        setCompanyName(data.companyName);
+        setLoading(false);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     }
   }
 
-
   useEffect(() => {
-    const inititializeDate = async () => {
-      await fetchCompanyId()
-      await fetchRooms()
-      await cleanupExpiredReservations()
+    const inititializeData = async () => {
+      await fetchCompanyId();
+      await fetchRooms();
+      await cleanupExpiredReservations();
     }
 
-    inititializeDate()
+    inititializeData();
 
-  }, [user])
-
-
-
+  }, [user]);
 
   if (loading) {
     return (
@@ -128,7 +130,6 @@ const page = () => {
                       quality={100}
                       className='shadow-sm w-full  h-48 object-cover rounded-xl'
                     >
-
                     </Image>
                     <div className='mt-4'>
                       <div className='flex items-center'>
@@ -146,13 +147,10 @@ const page = () => {
                       </p>
 
                       <Link className='btn btn-secondary btn-outline btn-sm mt-2 ' href={`/reservations/${room.id}`}>
-                      <SquareArrowOutUpRight className='w-4' />
-                      Reserver
+                        <SquareArrowOutUpRight className='w-4' />
+                        Réserver
                       </Link>
-
-
                     </div>
-
                   </li>
                 ))
 
@@ -165,8 +163,7 @@ const page = () => {
         </div>
       </div>
     </Wrapper>
-
   )
 }
 
-export default page
+export default Page;

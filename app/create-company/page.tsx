@@ -12,14 +12,11 @@ export interface Company {
     name: string;
 }
 
-
-const page = () => {
+const Page = () => { // Renommé la fonction 'page' en 'Page'
     const { user } = useKindeBrowserClient();
     const [companyName, setCompanyName] = useState('')
     const [loading, setLoading] = useState(true)
     const [companies, setCompanies] = useState<Company[] | null>(null)
-
-
 
     const [notification, setNotification] = useState<string>('')
     const closeNotification = () => {
@@ -83,18 +80,18 @@ const page = () => {
 
     useEffect(() => {
         fetchCompanies()
-    } , [user])
+    }, [user])
 
-    const handleDelete = async (companyId : string) => {
-        if(confirm('Voulez-vous vraiment supprimer cette entreprise ?')){
-              try {
-                const response = await fetch('/api/companies' , {
-                    method : 'DELETE',
+    const handleDelete = async (companyId: string) => {
+        if (confirm('Voulez-vous vraiment supprimer cette entreprise ?')) {
+            try {
+                const response = await fetch('/api/companies', {
+                    method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                      id : companyId
+                        id: companyId
                     })
                 })
 
@@ -103,20 +100,19 @@ const page = () => {
                     setNotification(message)
                     return
                 }
-    
+
                 setNotification('Entreprise supprimée avec succès !')
                 fetchCompanies()
-                
-              } catch (error) {
-                 console.error(error)
-                 setNotification('Erreur interne du serveur.');
-              }
+
+            } catch (error) {
+                console.error(error)
+                setNotification('Erreur interne du serveur.')
+            }
         }
     }
 
     return (
         <Wrapper>
-
             {notification && (
                 <Notification message={notification} onclose={closeNotification}></Notification>
             )}
@@ -143,7 +139,7 @@ const page = () => {
                     </div>
                 </form>
 
-                <h1 className=' text-2xl  mb-4 font*boald'>Mes entreprises</h1>
+                <h1 className=' text-2xl  mb-4 font-bold'>Mes entreprises</h1>
 
                 {loading ? (
                     <div className='text-center mt-32'>
@@ -162,25 +158,20 @@ const page = () => {
                                    <button 
                                       className='btn btn-sm'
                                       onClick={() => handleDelete(company.id)}
-                                   
                                    >
                                       <Trash2 className='w-4'/>
                                    </button>
                                 </div>
-                                
                             </li>
                         ))}
-
 
                     </ul>
                 ) : (
                     <p>Aucune entreprise trouvées.</p>
                 )}
-
-
             </div>
         </Wrapper>
     )
 }
 
-export default page
+export default Page
